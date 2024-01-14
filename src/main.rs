@@ -66,7 +66,7 @@ fn main() {
         } else {
             let file_path = command;
             let characters = readln("Enter characters to remove > ");
-            let lenght = readln("Enter lenght of allowed words").parse::<usize>().unwrap();
+            let lenght = readln("Enter length of allowed words").parse::<usize>().unwrap();
 
             let mut path = get_current_directory();
             path.push(PathBuf::from(file_path));
