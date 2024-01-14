@@ -1,0 +1,83 @@
+use std::{
+    io::{self, Write, BufReader, BufRead},
+    path::PathBuf,
+    fs::{File, OpenOptions},
+    env, clone,
+};
+
+fn readln(prompt: &str) -> String {
+    print!("{}", prompt);
+    io::stdout().flush().expect("Failed to flush output");
+    let mut input = String::new();
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read input");
+    input.trim_end().to_string()
+}
+
+fn read_file(path: &PathBuf) -> String {
+    let file = File::open(path).expect(&format!("Failed to open file {:?}", path));
+    let content: Vec<String> = BufReader::new(&file)
+        .lines()
+        .map(|line| line.unwrap())
+        .collect();
+    content.join("\n")
+}
+
+fn write_file(content: &str, path: &PathBuf) {
+    let mut file = OpenOptions::new()
+        .create(true)
+        .write(true)  // Use write(true) instead of append(true)
+        .open(path)
+        .unwrap_or_else(|e| panic!("Failed to open file {:?}: {}", path, e));
+
+    file.write_all(content.as_bytes())
+        .unwrap_or_else(|e| panic!("Failed to write to file {:?}: {}", path, e));
+
+    file.flush().unwrap_or_else(|e| panic!("Failed to flush file {:?}: {}", path, e));
+}
+
+fn sanitize(content: &str, chars_to_exclude: &str) -> String {
+    let mut res: Vec<String> = Vec::new();
+    let words = content.split('\n').collect::<Vec<&str>>();
+    let char_vec: Vec<char> = chars_to_exclude.chars().collect();
+    for word in words {
+        if word.contains(char_vec.as_slice()) {
+            continue;
+        } else {
+            res.push(word.to_owned());
+        }
+    }
+    res.join("\n")
+}
+
+
+fn get_current_directory() -> PathBuf {
+    env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+}
+
+fn main() {
+    println!("Welcome to word Sanitizer!");
+
+    loop {
+        let cmd = readln("Enter filename and characters you want to remove > ");
+        if cmd == "exit" || cmd == "quit" {
+            break;
+        } else {
+            let command: Vec<&str> = cmd.split(' ').collect();
+
+            if command.len() == 2 {
+                let mut path = get_current_directory();
+                let charcters = command[1];
+                path.push(PathBuf::from(command[0]));
+                let content = read_file(&path);
+                let result = sanitize(content.as_str(), charcters);
+                write_file(&result, &path);
+                println!("File has been updated");
+            } else {
+                println!("Invalid number of arguments.");
+            }
+        }
+    }
+    
+}
