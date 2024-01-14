@@ -51,7 +51,6 @@ fn sanitize(content: &str, chars_to_exclude: &str) -> String {
     res.join("\n")
 }
 
-
 fn get_current_directory() -> PathBuf {
     env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
 }
@@ -60,23 +59,19 @@ fn main() {
     println!("Welcome to word Sanitizer!");
 
     loop {
-        let cmd = readln("Enter filename and characters you want to remove > ");
-        if cmd == "exit" || cmd == "quit" {
+        let command = readln("Enter file path > ");
+        
+        if command == "exit" || command == "quit" {
             break;
         } else {
-            let command: Vec<&str> = cmd.split(' ').collect();
-
-            if command.len() == 2 {
-                let mut path = get_current_directory();
-                let charcters = command[1];
-                path.push(PathBuf::from(command[0]));
-                let content = read_file(&path);
-                let result = sanitize(content.as_str(), charcters);
-                write_file(&result, &path);
-                println!("File has been updated");
-            } else {
-                println!("Invalid number of arguments.");
-            }
+            let file_path = command;
+            let characters = readln("Enter characters to remove > ");
+            let mut path = get_current_directory();
+            path.push(PathBuf::from(file_path));
+            let content = read_file(&path);
+            let result = sanitize(content.as_str(), &characters);
+            write_file(&result, &path);
+            println!("File has been updated");
         }
     }
     
