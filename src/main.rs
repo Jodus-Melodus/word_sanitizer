@@ -66,14 +66,14 @@ fn main() {
         } else {
             let file_path = command;
             let characters = readln("Enter characters to remove > ");
-            let lenght = readln("Enter length of allowed words").parse::<usize>().unwrap();
+            let lenght = readln("Enter length of allowed words > ").parse::<usize>().unwrap_or(100);
 
             let mut path = get_current_directory();
             path.push(PathBuf::from(file_path));
             let content = read_file(&path);
             let result = sanitize(content.as_str(), &characters, lenght);
             write_file(&result, &path);
-            println!("File has been updated");
+            println!("File has been updated!");
         }
     }
     
