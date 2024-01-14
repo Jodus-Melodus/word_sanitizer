@@ -2,7 +2,7 @@ use std::{
     io::{self, Write, BufReader, BufRead},
     path::PathBuf,
     fs::{File, OpenOptions},
-    env, clone,
+    env,
 };
 
 fn readln(prompt: &str) -> String {
@@ -16,7 +16,7 @@ fn readln(prompt: &str) -> String {
 }
 
 fn read_file(path: &PathBuf) -> String {
-    let file = File::open(path).expect(&format!("Failed to open file {:?}", path));
+    let file = File::open(path).unwrap_or_else(|_| panic!("Failed to open file {:?}", path));
     let content: Vec<String> = BufReader::new(&file)
         .lines()
         .map(|line| line.unwrap())
@@ -37,12 +37,12 @@ fn write_file(content: &str, path: &PathBuf) {
     file.flush().unwrap_or_else(|e| panic!("Failed to flush file {:?}: {}", path, e));
 }
 
-fn sanitize(content: &str, chars_to_exclude: &str) -> String {
+fn sanitize(content: &str, chars_to_exclude: &str, word_length:usize) -> String {
     let mut res: Vec<String> = Vec::new();
     let words = content.split('\n').collect::<Vec<&str>>();
     let char_vec: Vec<char> = chars_to_exclude.chars().collect();
     for word in words {
-        if word.contains(char_vec.as_slice()) {
+        if word.contains(char_vec.as_slice()) && word.len() <= word_length {
             continue;
         } else {
             res.push(word.to_owned());
@@ -66,10 +66,12 @@ fn main() {
         } else {
             let file_path = command;
             let characters = readln("Enter characters to remove > ");
+            let lenght = readln("Enter lenght of allowed words").parse::<usize>().unwrap();
+
             let mut path = get_current_directory();
             path.push(PathBuf::from(file_path));
             let content = read_file(&path);
-            let result = sanitize(content.as_str(), &characters);
+            let result = sanitize(content.as_str(), &characters, lenght);
             write_file(&result, &path);
             println!("File has been updated");
         }
