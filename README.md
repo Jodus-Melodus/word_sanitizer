@@ -7,3 +7,4 @@ This is a word sanitizing program that takes a text file and removes unwanted ch
 - Simplistic user interface
 - Small
 - Choose what characters to remove
+- Specify what length the words should be

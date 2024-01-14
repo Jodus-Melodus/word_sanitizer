@@ -6,6 +6,7 @@ use std::{
 };
 
 fn readln(prompt: &str) -> String {
+    // Moved readline code to function for easy use
     print!("{}", prompt);
     io::stdout().flush().expect("Failed to flush output");
     let mut input = String::new();
@@ -16,6 +17,7 @@ fn readln(prompt: &str) -> String {
 }
 
 fn read_file(path: &PathBuf) -> String {
+    // Reads and returns the contents of the file supplied
     let file = File::open(path).unwrap_or_else(|_| panic!("Failed to open file {:?}", path));
     let content: Vec<String> = BufReader::new(&file)
         .lines()
@@ -25,9 +27,10 @@ fn read_file(path: &PathBuf) -> String {
 }
 
 fn write_file(content: &str, path: &PathBuf) {
+    // write the new sanitized words to the file replacing it
     let mut file = OpenOptions::new()
         .create(true)
-        .write(true)  // Use write(true) instead of append(true)
+        .write(true)
         .open(path)
         .unwrap_or_else(|e| panic!("Failed to open file {:?}: {}", path, e));
 
@@ -38,6 +41,7 @@ fn write_file(content: &str, path: &PathBuf) {
 }
 
 fn sanitize(content: &str, chars_to_exclude: &str, word_length:usize) -> String {
+    // Loop through the words in the file and removes the unwanted ones
     let mut res: Vec<String> = Vec::new();
     let words = content.split('\n').collect::<Vec<&str>>();
     let char_vec: Vec<char> = chars_to_exclude.chars().collect();
@@ -52,6 +56,7 @@ fn sanitize(content: &str, chars_to_exclude: &str, word_length:usize) -> String 
 }
 
 fn get_current_directory() -> PathBuf {
+    // Returns the current directory where the exe is running
     env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
 }
 
