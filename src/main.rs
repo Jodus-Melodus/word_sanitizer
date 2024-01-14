@@ -40,19 +40,14 @@ fn write_file(content: &str, path: &PathBuf) {
     file.flush().unwrap_or_else(|e| panic!("Failed to flush file {:?}: {}", path, e));
 }
 
-fn sanitize(content: &str, chars_to_exclude: &str, word_length:usize) -> String {
+fn sanitize(content: &str, chars_to_exclude: &str, word_length: usize) -> String {
     // Loop through the words in the file and removes the unwanted ones
-    let mut res: Vec<String> = Vec::new();
-    let words = content.split('\n').collect::<Vec<&str>>();
-    let char_vec: Vec<char> = chars_to_exclude.chars().collect();
-    for word in words {
-        if word.contains(char_vec.as_slice()) && word.len() <= word_length {
-            continue;
-        } else {
-            res.push(word.to_owned());
-        }
-    }
-    res.join("\n")
+    content
+        .split('\n')
+        .filter(|word| !word.contains(chars_to_exclude) && word.len() > word_length)
+        .map(|word| word.to_owned())
+        .collect::<Vec<String>>()
+        .join("\n")
 }
 
 fn get_current_directory() -> PathBuf {
